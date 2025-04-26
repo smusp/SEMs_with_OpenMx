@@ -1,7 +1,7 @@
 <img src = 'logo/Banner.svg' align = "center"/>
 
 
-- [Jose_2013](https://github.com/smusp/SEMs_with_OpenMx//tree/main/Jose_2013)
+- [Jose_2013](https://github.com/smusp/SEMs_with_OpenMx/tree/main/Jose_2013)
   Three variable mediation
 - [Kurbanoglu_2021](https://github.com/smusp/SEMs_with_OpenMx//tree/main/Kurbanoglu_2021)
   Three variable mediation using summary data
