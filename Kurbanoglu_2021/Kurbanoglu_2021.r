@@ -32,7 +32,7 @@ mcor = matrix( , 3, 3)                           # Empty matrix
 mcor[upper.tri(mcor, diag = TRUE)] <- vcor       # Fill the upper triangle
 mcor = pmax(mcor, t(mcor), na.rm = TRUE)         # Fill the lower triangle
 
-# Get covariances
+# Get (co)variances
 mcov <- outer(vsd, vsd) * mcor
 
 # Name the rows and columns
@@ -47,7 +47,7 @@ names(vmean) = names   # OpenMx requires the means be named
 dataCov <- mxData(observed = mcov, type = "cov", means = vmean, numObs = n)
 
 
-## The model is shown in Fig 1 (p. 51); also see Kurbanoglu_2021.pdf in images folder
+## The model is shown in Fig 1 (p. 51); also see Kurbanoglu_2021.svg in images folder
 
 
 ## Regressions
@@ -60,7 +60,7 @@ regPaths2 <- mxPath(from = "SE", to = "Att",
 
 ## Variances
 varPaths <- mxPath(from = names, 
-   arrows = 2, values = 1, labels = c("vAtt", "vSE", "vAnx"))
+   arrows = 2, values = 1, labels = c("eAtt", "vSE", "eAnx"))
 
 
 ## Means and intercepts
@@ -108,7 +108,7 @@ estZ
 
 
 ## R squares - calculate by hand
-# For variables implicated in regression,
+# For variables implicated in regressions,
 # R square is given by matrix product of:
 #   row matrix of correlations and
 #   column matrix of standardised regression coefficients
@@ -147,3 +147,6 @@ medModel <- mxModel(medModel, ci)
 # Run the model
 fit <- mxRun(medModel, intervals = TRUE)
 summary(fit)$CI
+
+
+##  

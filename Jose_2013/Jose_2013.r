@@ -35,7 +35,7 @@ dataRaw <- mxData(observed = df, type = "raw")
 
 
 ## The model is shown in Fig 3.3 (p. 46);
-## or see Jose_2013.pdf in images folder.
+## or see Jose_2013.svg in images folder.
 
 ## Regressions
 #  - Arrows from "ple" and "grat" to "shs".
@@ -57,22 +57,24 @@ regPaths2 <- mxPath(from = "ple", to = "grat",
    labels = "a")
 
 
-## Variances
+## Variance
+## Exogenous variables ("ple") have variances;
+## Endogenous variables ("grat" and "shs") have residual or error variances.
 #  - Arrows are from manifest variables to manifest variables
 #    (when "arrows = 2", the "to" argument can be omitted); 
 #    ie, from "ple" to "ple"; from "grat" to "grat"; and from "shs" to "shs".
 #  - Arrows are two headed.
 #  - Starting values are 1.
-#  - Labels are "vPLE" "vGRAT", and "vSHS".
+#  - Labels are "vPLE" "eGRAT", and "eSHS".
 varPaths <- mxPath(from = manifest,
    arrows = 2, values = 1,
-   labels = c("vPLE", "vGRAT", "vSHS"))
+   labels = c("vPLE", "eGRAT", "eSHS"))
 
 
 ## Means and intercepts
 ## Exogenous variables ("ple") have means;
 ## endogenous variables ("grat" and "shs") have intercepts.
-## Regress variables on a constant; in OpenMx, "one".
+## Regress variables on a constant - in OpenMx, "one".
 
 #  - Arrows from "one" to the manifest variables;
 #    ie, from "one" to "ple"; from "one" to "grat"; from "one" to "shs".
@@ -110,6 +112,7 @@ coef(fit)      # Just the estimates
 
 ## Extract indirect and total effects (and their standard errors) from "fit" object
 estimates <- mxEval(c(indirect, total), fit); estimates
+
 SE <- sapply(c("indirect", "total"), function(x) mxSE(x, fit, silent = TRUE)); SE
 
 # Compare with unstandardised indirect and total effect in Fig 3.6 (p. 59).
@@ -138,7 +141,7 @@ estZ
 ## Bootstrap CIs
 fitBoot <- mxBootstrap(fit, 2000)
 # statistics <- summary(fitBoot, boot.quantile = c(0.025, 0.975),
-#    boot.SummaryType = "bcbci")
+#    boot.SummaryType = "bcbci"); statistics
 # Note: No defined effects
 ci <- mxBootstrapEval(c(a, b, cprime, indirect, total), fitBoot, 
    bq = c(0.025, 0.975), method = "bcbci"); ci
