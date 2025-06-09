@@ -1,0 +1,32 @@
+
+\usepackage{newpxtext,newpxmath}   % /upbeta
+%\usepackage{fouriernc}            % /otherbeta
+\usepackage{amsmath}
+\renewcommand{\familydefault}{\sfdefault}
+\usepackage{mathastext}
+
+\usetikzlibrary{positioning, quotes, calc, math, arrows.meta, bending, shapes, backgrounds}
+
+\tikzset{
+every edge quotes/.style = {fill = white},
+every node/.style = {scale = 1.1},
+manifest/.style = {rectangle, draw, thin, inner sep = 3pt, minimum width = 1cm,
+   minimum height = .85cm, align = center},
+latent/.style = {ellipse, draw, thin, inner sep = 3pt, minimum width = 1cm,
+   minimum height = .85cm},
+residual1/.style = {circle, draw, thin, minimum size = 5mm, inner sep = 1pt},
+residual2/.style = {rectangle, minimum width = 0.5pt, minimum height = 1.5mm,
+   inner sep = 0pt, outer sep = 0mm},
+regression/.style = {-{Stealth[length = 1.5mm]}, thin, shorten > = 1pt, 
+   inner sep = 1.5pt, outer sep = 0mm},
+covariance/.style={{Stealth[length = 1.5mm]}-{Stealth[length = 1.5mm]}, thin,
+   shorten > = 1pt, shorten < = 1pt, inner sep = 1.5pt},
+variance/.style={{Stealth[length = 1mm]}-{Stealth[length = 1mm]}, thin,
+   shorten > = 1pt, shorten < = 1pt, inner sep = 1pt},
+interaction/.style = {-{Stealth[sep = 1pt, length = 1.5mm] . Circle[length = 4pt]},
+   thin, shorten > = -2pt},
+constant/.style = {draw, thin, inner sep = 1pt, regular polygon,
+   regular polygon sides = 3, minimum size = 5mm},
+group/.style = {rectangle, inner sep = 2pt, minimum width = 15mm, minimum height = 5mm, 
+   align = center}
+}

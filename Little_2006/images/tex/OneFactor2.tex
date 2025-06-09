@@ -1,0 +1,46 @@
+\documentclass[tikz, border = 10pt]{standalone}
+
+\input{SEMstyles.tex}
+
+\begin{document}
+\begin{tikzpicture}
+
+%% pos manifests
+\node [manifest] (pos1) {$pos_1$};
+\node [manifest] (pos2) [right = 1.6cm of pos1] {$pos_2$};
+\node [manifest] (pos3) [right = 1.5cm of pos2] {$pos_3$};
+
+%% POS latent
+\node [latent] (POS) [above = 3cm of pos2] {$POS$};
+
+%% Loadings
+\path [regression] (POS) edge ["$\uplambda_1$"] (pos1.90);
+\path [regression] (POS) edge ["$\uplambda_2$"] (pos2.90);
+\path [regression] (POS) edge ["$\uplambda_3\!=\!1$"] (pos3.90);
+
+%% Latent variance
+\path [variance] (POS.120) edge ["$\upphi$", above, outer sep = 1pt, bend left = 110, looseness = 3] (POS.60);
+
+%% Residuals
+\node [residual2] (e1) [above left = .65cm of pos1, xshift = 1mm] {};
+\path [regression] (e1) edge ["$\uptheta_1$", pos = 0] (pos1.north west);
+
+\node [residual2] (e2) [above left = .65cm of pos2, xshift = 1mm] {};
+\path [regression] (e2) edge ["$\uptheta_2$", pos = 0] (pos2.north west);
+
+\node [residual2] (e3) [above left = .65cm of pos3, xshift = 1mm] {};
+\path [regression] (e3) edge ["$\uptheta_3$", pos = 0] (pos3.north west);
+
+%% latent means
+\node [constant, black!30] (M1) [right = 2cm of POS] {1};
+\node [constant, black!30] (M2) [below = 2cm of pos2] {1};
+\path [regression, black!30] (M1) edge ["$\upkappa$"] (POS);
+
+%% Intercepts
+\path [regression, black!30] (M2.110) edge ["$\uptau_1$"] (pos1.270);
+\path [regression, black!30] (M2.90) edge ["$\uptau_2$"] (pos2.270);
+\path [regression, black!30] (M2.70) edge ["$\uptau_3\!=\!0$"] (pos3.270);
+
+\end{tikzpicture}
+\end{document}
+
