@@ -5,6 +5,12 @@
 ## and attitudes. Journal of Family, Counseling and Education, 6(1), 47-56.
 
 
+## This example shows a basic three-variable mediation
+## analysis, amd how to use summary data (correlations, 
+## standard deviations, and means) when the raw sample
+## are not available.
+
+
 ## Load package
 library(OpenMx)
 
@@ -12,12 +18,12 @@ library(OpenMx)
 ## Get the data from Table 1 (p. 50)
 # Vectors of correlations, standard deviations, and means.
 # Correlations entered row-by-row.
-# (If entered column-by-column, use 'lower.tri' in line 32 below.)
+# (If entered column-by-column, use 'lower.tri' in line 38 below.)
 vcor <- c(
    1,
    0.30,  1,
   -0.42, -0.32,  1)
-vsd <- c(8.81, 7.95, 18.30)             # Standard deviations
+vsd   <- c(8.81, 7.95, 18.30)           # Standard deviations
 vmean <- c(56.57, 40.39, 68.22)         # Means
 n <- 513                                # Sample size
 
@@ -26,13 +32,13 @@ n <- 513                                # Sample size
 names <- c("Att", "SE", "Anx")
 
 
-## Get the (co)variance matrix
+## Get the co/variance matrix
 # First, get full correlation matrix
 mcor = matrix( , 3, 3)                           # Empty matrix
 mcor[upper.tri(mcor, diag = TRUE)] <- vcor       # Fill the upper triangle
 mcor = pmax(mcor, t(mcor), na.rm = TRUE)         # Fill the lower triangle
 
-# Get (co)variances
+# Get co/variances
 mcov <- outer(vsd, vsd) * mcor
 
 # Name the rows and columns
@@ -41,13 +47,13 @@ dimnames(mcov) <- list(names, names); mcov
 names(vmean) = names   # OpenMx requires the means be named
 
 
+## The model is shown in Fig 1 (p. 51); also see Kurbanoglu_2021.svg in the images folder.
+
+
 #### Collect the bits and pieces needed by OpenMx
 
 ## Get data into OpenMx format
 dataCov <- mxData(observed = mcov, type = "cov", means = vmean, numObs = n)
-
-
-## The model is shown in Fig 1 (p. 51); also see Kurbanoglu_2021.svg in images folder
 
 
 ## Regressions
@@ -147,6 +153,3 @@ medModel <- mxModel(medModel, ci)
 # Run the model
 fit <- mxRun(medModel, intervals = TRUE)
 summary(fit)$CI
-
-
-##  

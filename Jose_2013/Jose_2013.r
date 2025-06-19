@@ -5,6 +5,7 @@
 
 ## Chapter 3 describes a basic three-variable mediation analysis.
 
+
 ## Load packages
 library(OpenMx)
 library(haven)   # To read SPSS data files
@@ -23,6 +24,10 @@ head(df)
 summary(df)
 
 
+## The model is shown in Fig 3.3 (p. 46);
+## or see Jose_2013.svg in the images folder.
+
+
 #### Collect the bits and pieces needed by OpenMx
 
 
@@ -33,9 +38,6 @@ manifest <- names(df)
 ## Data - Get data into OpenMx format
 dataRaw <- mxData(observed = df, type = "raw")
 
-
-## The model is shown in Fig 3.3 (p. 46);
-## or see Jose_2013.svg in images folder.
 
 ## Regressions
 #  - Arrows from "ple" and "grat" to "shs".
@@ -57,7 +59,7 @@ regPaths2 <- mxPath(from = "ple", to = "grat",
    labels = "a")
 
 
-## Variance
+## Variances
 ## Exogenous variables ("ple") have variances;
 ## Endogenous variables ("grat" and "shs") have residual or error variances.
 #  - Arrows are from manifest variables to manifest variables
@@ -143,7 +145,7 @@ fitBoot <- mxBootstrap(fit, 2000)
 # statistics <- summary(fitBoot, boot.quantile = c(0.025, 0.975),
 #    boot.SummaryType = "bcbci"); statistics
 # Note: No defined effects
-ci <- mxBootstrapEval(c(a, b, cprime, indirect, total), fitBoot, 
+ci <- mxBootstrapEval(c(a, b, cprime, indirect, total), fitBoot,
    bq = c(0.025, 0.975), method = "bcbci"); ci
 
 
