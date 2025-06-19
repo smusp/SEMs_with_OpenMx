@@ -1,7 +1,8 @@
 
-#### Methods of Scaling abd Identification
+#### Methods of Scaling and Identification
 
 
+## Some easy ones first.
 ## Demonstrates three methods of scaling in a one-factor model:
 ## 1. Reference-Group Method - Constrain latent variable's variance and mean;
 ## 2. Marker-Variable Method - Constrain one loading and that indicator's intercept;
@@ -14,9 +15,9 @@
 ## One Factor:
 #  "Positive Affect" factor for 7th grade
 
-#  Data in Appendix A of:
-# Little, T., Slegers, D., & Card, N. (2006). A non-arbitrary method of 
-# identifying and scaling latent variables in SEM and MACS models. 
+# Data in Appendix A of:
+# Little, T., Slegers, D., & Card, N. (2006). A non-arbitrary method of
+# identifying and scaling latent variables in SEM and MACS models.
 # Structural Equation Modeling, 13(1), 59-72.
 
 
@@ -24,7 +25,7 @@
 library(OpenMx)
 
 
-## Get data 
+## Get data
 # Vectors of correlations (row-by-row), standard deviations, and means, and sample size.
 vcor <- c(
    1.00000,
@@ -32,31 +33,31 @@ vcor <- c(
    0.76214,  0.78705,  1.00000)
 
 vmean <- c(3.13552, 2.99061, 3.06945)
-vsd <- c(0.66770, 0.68506, 0.70672)
-n <- 380
+vsd   <- c(0.66770, 0.68506, 0.70672)
+n     <- 380
 
 # Variable names
 names <- c("pos1", "pos2", "pos3")
 
 # Get full correlation matrix
-mcor = matrix( , 3, 3)                           # Empty matrix
+mcor <- matrix( , 3, 3)                          # Empty matrix
 mcor[upper.tri(mcor, diag = TRUE)] <- vcor       # Fill the upper triangle
-mcor = pmax(mcor, t(mcor), na.rm = TRUE)         # Fill the lower triangle
+mcor <- pmax(mcor, t(mcor), na.rm = TRUE)        # Fill the lower triangle
 
-# Get (co)variance matrix 
+# Get co/variance matrix
 mcov <- outer(vsd, vsd) * mcor
 
 # Name the rows and columns
 dimnames(mcov) <- list(names, names); mcov
 
-names(vmean) = names   # OpenMx requires the means be named
+names(vmean) <- names   # OpenMx requires the means be named
 
 # Get data into OpenMx format
 data <- mxData(observed = mcov, type = "cov", means = vmean, numObs = n)
 
 
 
-### Method 1 
+### Method 1
 ## See model diagram in OneFactor1.svg
 #  Labels are Little el al's Greek labels
 
@@ -74,7 +75,7 @@ loadings <- mxPath(from = "POS", to = names, arrows = 1,
 # Factor variance - Constrain variance to 1
 varFac <- mxPath(from = "POS", arrows = 2,
    free = FALSE, values = 1,
-   labels = "phi")   
+   labels = "phi")
 
 # Factor mean - Constrain mean to 0
 means <- mxPath(from = "one", to = "POS", arrows = 1,
@@ -87,7 +88,7 @@ varRes <- mxPath(from = names, arrows = 2,
    labels = c("theta1", "theta2", "theta3"))
 
 # Intercepts
-intercepts <- mxPath(from = "one", to = c(names), arrows = 1,
+intercepts <- mxPath(from = "one", to = names, arrows = 1,
    free = TRUE, values = 1,
    labels = c("tau1", "tau2", "tau3"))
 
@@ -104,9 +105,9 @@ summary(fit1)
 
 # These models are just-identified.
 # Number of variables is 3;
-# Therefore, number of pieces of information in (co)variance matrix: (3 X 4) / 2 = 6
+# Therefore, number of pieces of information in co/variance matrix: (3 X 4) / 2 = 6
 # plus 3 means = 9 pieces of information
-# Number of parameters: 
+# Number of parameters:
 #   3 loadings
 #   3 redisual variances
 #   3 intercepts
@@ -134,7 +135,7 @@ m1 <- "
   # Latent variance - Constrained to 1
   POS ~~ 1*phi*POS
 
-  # Latent means - Constrained to 0
+  # Latent mean - Constrained to 0
   POS ~ 0*kappa*1
   
   # Residual variances
@@ -148,13 +149,13 @@ m1 <- "
   pos3 ~ tau3*1
 "
 
-m1_fit = sem(m1, sample.cov = mcov, sample.nobs = n, sample.mean = vmean)
-OpenMx = coef(fit1)
-lavaan = coef(m1_fit)
+m1_fit <- sem(m1, sample.cov = mcov, sample.nobs = n, sample.mean = vmean)
+OpenMx <- coef(fit1)
+lavaan <- coef(m1_fit)
 
 # Get coefs in same order
-lavaan <- lavaan[match(names(OpenMx), names(lavaan))] 
-t(rbind(OpenMx, lavaan))
+lavaan <- lavaan[match(names(OpenMx), names(lavaan))]
+cbind(OpenMx, lavaan)
 ########################
 
 
@@ -171,7 +172,7 @@ loadings <- mxPath(from = "POS", to = names, arrows = 1,
 
 # Factor variance
 varFac <- mxPath(from = "POS", arrows = 2,
-   free = TRUE, values = 1, 
+   free = TRUE, values = 1,
    labels = "phi")
 
 # Factor mean
@@ -182,7 +183,7 @@ means <- mxPath(from = "one", to = "POS", arrows = 1,
 # Residual variances
 varRes <- mxPath(from = names, arrows = 2,
    free = TRUE, values = 1,
-   labels = c("theta1", "theta2", "theta3")) 
+   labels = c("theta1", "theta2", "theta3"))
 
 # Intercepts - Constrain 3rd intercept to 0
 intercepts <- mxPath(from = "one", to = names, arrows = 1,
@@ -213,7 +214,7 @@ m2 <- "
   # Latent variance
   POS ~~ phi*POS
 
-  # Latent means 
+  # Latent mean
   POS ~ kappa*1
 
   # Residual variances
@@ -227,13 +228,13 @@ m2 <- "
   pos3 ~ 0*tau3*1
 "
 
-m2_fit = sem(m2, sample.cov = mcov, sample.nobs = n, sample.mean = vmean)
-OpenMx = coef(fit2)
-lavaan = coef(m2_fit)
+m2_fit <- sem(m2, sample.cov = mcov, sample.nobs = n, sample.mean = vmean)
+OpenMx <- coef(fit2)
+lavaan <- coef(m2_fit)
 
 # Get coefs in same order
 lavaan <- lavaan[match(names(OpenMx), names(lavaan))]      
-t(rbind(OpenMx, lavaan))
+cbind(OpenMx, lavaan)
 ########################
 
 
@@ -250,7 +251,7 @@ loadings <- mxPath(from = "POS", to = names, arrows = 1,
 
 # Factor variance
 varFac <- mxPath(from = "POS", arrows = 2,
-   free = TRUE, values = 1, 
+   free = TRUE, values = 1,
    labels = "phi")
 
 # Factor mean
@@ -260,7 +261,7 @@ means <- mxPath(from = "one", to = "POS", arrows = 1,
    
 # Residual variances
 varRes <- mxPath(from = names, arrows = 2,
-   free = TRUE, values = 1, 
+   free = TRUE, values = 1,
    labels = c("theta1", "theta2", "theta3"))
 
 # Intercepts
@@ -269,15 +270,15 @@ intercepts <- mxPath(from = "one", to = names, arrows = 1,
    labels = c("tau1", "tau2", "tau3"))
 
 # Constraints
-conLoadings <- mxConstraint(lambda1 + lambda2 + lambda3 == 3)
-conIntercepts <- mxConstraint(tau1 + tau2 + tau3 == 0)
+conLoad <- mxConstraint(lambda1 + lambda2 + lambda3 == 3)
+conInter <- mxConstraint(tau1 + tau2 + tau3 == 0)
 
 
 ## Setup the model
 model3 <- mxModel("One Factor Model", type = "RAM",
    manifestVars = names, latentVars = "POS",
    data, loadings, means, varFac, varRes, intercepts,
-   conLoadings, conIntercepts)
+   conLoad, conInter)
 
 
 ## Run the model and get summary
@@ -315,11 +316,11 @@ m3 <- "
   tau1 + tau2 + tau3 == 0
 "
 
-m3_fit = sem(m3, sample.cov = mcov, sample.nobs = n, sample.mean = vmean)
-OpenMx = coef(fit3)
-lavaan = coef(m3_fit)
+m3_fit <- sem(m3, sample.cov = mcov, sample.nobs = n, sample.mean = vmean)
+OpenMx <- coef(fit3)
+lavaan <- coef(m3_fit)
 
 # Get coefs in same order
 lavaan <- lavaan[match(names(OpenMx), names(lavaan))]
-t(rbind(OpenMx, lavaan))
+cbind(OpenMx, lavaan)
 ########################

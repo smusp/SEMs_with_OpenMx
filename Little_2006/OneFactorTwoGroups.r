@@ -2,6 +2,7 @@
 #### Methods of Scaling and Identification
 
 
+## Some easy ones first.
 ## Demonstrates three methods of scaling in one-factor, two-group model:
 ## 1. Reference-Group Method - Constrain latent variable's variance and mean;
 ## 2. Marker-Variable Method - Constrain one loading and that indicator's intercept;
@@ -17,8 +18,8 @@
 
 ## One Factor, Two Groups
 #  "Positive Affect" factor for 7th and 8th grades
-#  Data in Appendix A of:
-#
+
+# Data in Appendix A of:
 # Little, T., Slegers, D., & Card, N. (2006). A non-arbitrary method of
 # identifying and scaling latent variables in SEM and MACS models.
 # Structural Equation Modeling, 13(1), 59-72.
@@ -28,7 +29,7 @@
 library(OpenMx)
 
 
-## Get data 
+## Get data
 # Vectors of correlations (row-by-row), standard deviations, and means, and sample size.
 # 7th grade
 vcor7 <- c(
@@ -37,8 +38,8 @@ vcor7 <- c(
    0.76214,  0.78705,  1.00000)
 
 vmean7 <- c(3.13552, 2.99061, 3.06945)
-vsd7 <- c(0.66770, 0.68506, 0.70672)
-n7 <- 380
+vsd7   <- c(0.66770, 0.68506, 0.70672)
+n7     <- 380
 
 # 8th grade
 vcor8 <- c(
@@ -47,23 +48,23 @@ vcor8 <- c(
    0.84980,  0.83523,  1.00000)
 
 vmean8 <- c(3.07338, 2.84716, 2.97882)
-vsd8 <- c(0.70299, 0.71780, 0.76208)
-n8 <- 379
+vsd8   <- c(0.70299, 0.71780, 0.76208)
+n8     <- 379
 
 # Variable names
 names <- c("pos1", "pos2", "pos3")
 
 
 # Get full correlation matrix for each Grade
-mcor7 = matrix( , 3, 3)                            # Empty matrix
+mcor7 <- matrix( , 3, 3)                           # Empty matrix
 mcor7[upper.tri(mcor7, diag = TRUE)] <- vcor7      # Fill the upper triangle
-mcor7 = pmax(mcor7, t(mcor7), na.rm = TRUE)        # Fill the lower triangle
+mcor7 <- pmax(mcor7, t(mcor7), na.rm = TRUE)       # Fill the lower triangle
 
-mcor8 = matrix( , 3, 3)                            # Empty matrix
+mcor8 <- matrix( , 3, 3)                           # Empty matrix
 mcor8[upper.tri(mcor8, diag = TRUE)] <- vcor8      # Fill the upper triangle
-mcor8 = pmax(mcor8, t(mcor8), na.rm = TRUE)        # Fill the lower triangle
+mcor8 <- pmax(mcor8, t(mcor8), na.rm = TRUE)       # Fill the lower triangle
 
-# Get (co)variance matrix
+# Get co/variance matrices
 mcov7 <- outer(vsd7, vsd7) * mcor7
 mcov8 <- outer(vsd8, vsd8) * mcor8
 
@@ -72,13 +73,13 @@ dimnames(mcov7) <- list(names, names)
 dimnames(mcov8) <- list(names, names)
 mcov7; mcov8
 
-names(vmean7) = names   # OpenMx requires the means be named
-names(vmean8) = names
+names(vmean7) <- names   # OpenMx requires the means be named
+names(vmean8) <- names
 
 # Put data into lists - used in lavaan analysis
-mcov = list("Grade 7" = mcov7, "Grade 8" = mcov8)
-vmean = list(vmean7, vmean8)
-n = list(n7, n8)
+mcov <- list("Grade 7" = mcov7, "Grade 8" = mcov8)
+vmean <- list(vmean7, vmean8)
+n <- list(n7, n8)
 
 # Get data into OpenMx format
 data7 <- mxData(observed = mcov7, type = "cov", means = vmean7, numObs = n7)
@@ -110,7 +111,7 @@ varFac7 <- mxPath(from = "POS", arrows = 2,
 varFac8 <- mxPath(from = "POS", arrows = 2,
    free = TRUE, values = 1, labels = "phi8")
 
-# Factor mean - Constrain Grade 7 mean to 0
+# Factor means - Constrain Grade 7 mean to 0
 means7 <- mxPath(from = "one", to = "POS", arrows = 1,
    free = FALSE, values = 0, labels = "kappa7")
 
@@ -152,7 +153,7 @@ fit1 <- mxRun(model1)
 summary(fit1)
 
 # Number of variables: 3
-# Number of pices of information in (co)variance matrix: (3 X 4) / 2 = 6
+# Number of pices of information in co/variance matrix: (3 X 4) / 2 = 6
 # plus 3 means = 9 pieces of information for each group;
 # that is, 18 for the model
 
@@ -181,7 +182,7 @@ m1 <- "
   # Loadings
   POS =~ c(NA,NA)*c(lambda1, lambda1)*pos1 + c(lambda2, lambda2)*pos2 + c(lambda3, lambda3)*pos3
 
-  # Latent variance - Consteain Grade 7 variance to 1
+  # Latent variances - Constrain Grade 7 variance to 1
   POS ~~ c(1, NA)*c(phi7, phi8)*POS
 
   # Latent means - Constrain Grade 7 mean to 0
@@ -192,20 +193,20 @@ m1 <- "
   pos2 ~~ c(theta72, theta82)*pos2
   pos3 ~~ c(theta73, theta83)*pos3
   
-  # Intercepts 
+  # Intercepts
   pos1 ~ c(tau1, tau1)*1
   pos2 ~ c(tau2, tau2)*1
   pos3 ~ c(tau3, tau3)*1
 "
 
-m1_fit = sem(m1, sample.cov = mcov, sample.nobs = n, sample.mean = vmean)
+m1_fit <- sem(m1, sample.cov = mcov, sample.nobs = n, sample.mean = vmean)
 summary(m1_fit)
-OpenMx = coef(fit1)
-lavaan = coef(m1_fit)
+OpenMx <- coef(fit1)
+lavaan <- coef(m1_fit)
 
 # Get coefs in same order
 lavaan <- lavaan[match(names(OpenMx), names(lavaan))]
-t(rbind(OpenMx, lavaan))
+cbind(OpenMx, lavaan)
 ########################
 
 
@@ -214,8 +215,8 @@ t(rbind(OpenMx, lavaan))
 ## See model diagram in OneFactorTwoGroups2.svg
 ## Constrain third loading in POS to 1
 ## Constrain third intercept to 0
-## With strong measurement invariance, 
-## these constraints apply to both 
+## With strong measurement invariance,
+## these constraints apply to both Grades.
 
 # Factor loadings - Constrain 3rd loading to 1
 loadings <- mxPath(from = "POS", to = names, arrows = 1,
@@ -235,15 +236,15 @@ means7 <- mxPath(from = "one", to = "POS", arrows = 1,
 
 means8 <- mxPath(from = "one", to = "POS", arrows = 1,
    free = TRUE, values = 1, labels = "kappa8")
-   
+
 # Residual variances
 varRes7 <- mxPath(from = names, arrows = 2,
-   free = TRUE, values = 1, 
+   free = TRUE, values = 1,
    labels = c("theta71", "theta72", "theta73"))
 
 varRes8 <- mxPath(from = names, arrows = 2,
-   free = TRUE, values = 1, 
-   labels = c("theta81", "theta82", "theta83")) 
+   free = TRUE, values = 1,
+   labels = c("theta81", "theta82", "theta83"))
 
 # Intercepts - Constrain 3rd intercept to 0
 intercepts <- mxPath(from = "one", to = names, arrows = 1,
@@ -290,21 +291,21 @@ m2 <- "
   pos1 ~~ c(theta71, theta81)*pos1
   pos2 ~~ c(theta72, theta82)*pos2
   pos3 ~~ c(theta73, theta83)*pos3
-  
+
   # Intercepts - Constrain 3rd intercept to 0 in both Grades
   pos1 ~ c(tau1, tau1)*1
   pos2 ~ c(tau2, tau2)*1
   pos3 ~ c(0,0)*c(tau3, tau3)*1
 "
 
-m2_fit = sem(m2, sample.cov = mcov, sample.nobs = n, sample.mean = vmean)
+m2_fit <- sem(m2, sample.cov = mcov, sample.nobs = n, sample.mean = vmean)
 summary(m2_fit)
-OpenMx = coef(fit2)
-lavaan = coef(m2_fit)
+OpenMx <- coef(fit2)
+lavaan <- coef(m2_fit)
 
 # Get coefs in same order
-lavaan <- lavaan[match(names(OpenMx), names(lavaan))]      
-t(rbind(OpenMx, lavaan))
+lavaan <- lavaan[match(names(OpenMx), names(lavaan))]
+cbind(OpenMx, lavaan)
 ########################
 
 
@@ -313,7 +314,7 @@ t(rbind(OpenMx, lavaan))
 ## See model diagram in OneFactorTwoGroups3.svg
 ## Constrain sum of loadings to equal number of loadings
 ## Constrain sum of intercepts to equal 0
-## With strong measurement invariance, 
+## With strong measurement invariance,
 ## these constraints apply to both Grades.
 
 # Factor loadings
@@ -337,7 +338,7 @@ means8 <- mxPath(from = "one", to = "POS", arrows = 1,
 
 # Residual variances
 varRes7 <- mxPath(from = names, arrows = 2,
-   free = TRUE, values = 1, 
+   free = TRUE, values = 1,
    labels = c("theta71", "theta72", "theta73"))
 
 varRes8 <- mxPath(from = names, arrows = 2,
@@ -368,7 +369,7 @@ conInter <- mxConstraint(tau1 + tau2 + tau3 == 0)
 ## Combine the two models
 fun <- mxFitFunctionMultigroup(c("Grade7.fitfunction", "Grade8.fitfunction"))
 model3 <- mxModel("One Factor Two Group Model", modGr7, modGr8,
-   conLoadings, conIntercepts, fun)
+   conLoad, conInter, fun)
 
 # Note: Constraints are added to final model, not to each of the Grade7 and Grade 8 models;
 # otherwise, OpenMx will count them as 4 constraints, accounting for 4 degrees of freedom,
@@ -411,7 +412,7 @@ m3 <- "
   # Latent variances
   POS ~~ c(phi7, phi8)*POS
 
-  # Latent means 
+  # Latent means
   POS ~ c(kappa7, kappa8)*1
 
   # Residual variances
@@ -419,7 +420,7 @@ m3 <- "
   pos2 ~~ c(theta72, theta82)*pos2
   pos3 ~~ c(theta73, theta83)*pos3
   
-  # Intercepts 
+  # Intercepts
   pos1 ~ c(tau1, tau1)*1
   pos2 ~ c(tau2, tau2)*1
   pos3 ~ c(tau3, tau3)*1
@@ -429,12 +430,12 @@ m3 <- "
   tau1 + tau2 + tau3 == 0
 "
 
-m3_fit = sem(m3, sample.cov = mcov, sample.nobs = n, sample.mean = vmean)
+m3_fit <- sem(m3, sample.cov = mcov, sample.nobs = n, sample.mean = vmean)
 summary(m3_fit)
-OpenMx = coef(fit3)
-lavaan = coef(m3_fit)
+OpenMx <- coef(fit3)
+lavaan <- coef(m3_fit)
 
 # Get coefs in same order
-lavaan <- lavaan[match(names(OpenMx), names(lavaan))] 
-t(rbind(OpenMx, lavaan))
+lavaan <- lavaan[match(names(OpenMx), names(lavaan))]
+cbind(OpenMx, lavaan)
 ########################

@@ -2,9 +2,10 @@
 #### Methods of Scaling and Identification
 
 
+## Some easy ones first.
 ## Demonstrates three methods of scaling in two-factor model:
 ## 1. Reference-Group Method - Constrain latent variables' variances and means;
-## 2. Marker-Variable Method - Constrain one loading and that indicator's 
+## 2. Marker-Variable Method - Constrain one loading and that indicator's
 ##    intercept in both factors;
 ## 3. Effects-Scaling Method - Constrain sums of loadings and intercepts
 ##    for both factors.
@@ -15,10 +16,10 @@
 
 ## Two Factors
 #  "Positive Affect" and "Negative Affect" factors for 7th grade
-#  Data in Appendix A of:
-#
-# Little, T., Slegers, D., & Card, N. (2006). A non-arbitrary method of 
-# identifying and scaling latent variables in SEM and MACS models. 
+
+# Data in Appendix A of:
+# Little, T., Slegers, D., & Card, N. (2006). A non-arbitrary method of
+# identifying and scaling latent variables in SEM and MACS models.
 # Structural Equation Modeling, 13(1), 59-72.
 
 
@@ -37,25 +38,25 @@ vcor <- c(
   -0.02222, -0.05180, -0.10250,  0.81616,  0.81076,  1.00000)
 
 vmean <- c(3.13552, 2.99061, 3.06945, 1.70069, 1.52705, 1.54483)
-vsd <- c(0.66770, 0.68506, 0.70672, 0.71418, 0.66320, 0.65276)
-n <- 380
+vsd   <- c(0.66770, 0.68506, 0.70672, 0.71418, 0.66320, 0.65276)
+n     <- 380
 
 # Variable names
 names <- c("pos1", "pos2", "pos3", "neg1", "neg2", "neg3")
 
 # Get full correlation matrix
-mcor = matrix( , 6, 6)                           # Empty matrix
+mcor <- matrix( , 6, 6)                          # Empty matrix
 mcor[upper.tri(mcor, diag = TRUE)] <- vcor       # Fill the upper triangle
-mcor = pmax(mcor, t(mcor), na.rm = TRUE)         # Fill the lower triangle
+mcor <- pmax(mcor, t(mcor), na.rm = TRUE)        # Fill the lower triangle
 
-# Get (co)variance matrix 
+# Get co/variance matrix
 mcov <- outer(vsd, vsd) * mcor
 
 # Name the rows and columns
 dimnames(mcov) <- list(names, names)
 mcov
 
-names(vmean) = names   # OpenMx requires the means be named
+names(vmean) <- names   # OpenMx requires the means be named
 
 # Get data into OpenMx format
 data <- mxData(observed = mcov, type = "cov", means = vmean, numObs = n)
@@ -64,7 +65,7 @@ data <- mxData(observed = mcov, type = "cov", means = vmean, numObs = n)
 
 ### Method 1
 ## See model diagram in TwoFactors1.svg
-# Labels are Little el al's Greek labels 
+# Labels are Little el al's Greek labels
 
 ## Constrain latent variances to 1
 ## Constrain latent means to 0
@@ -78,12 +79,12 @@ loadings1 <- mxPath(from = "POS", to = c("pos1", "pos2", "pos3"), arrows = 1,
    labels = c("lambda1", "lambda2", "lambda3"))
 
 loadings2 <- mxPath(from = "NEG", to = c("neg1", "neg2", "neg3"), arrows = 1,
-   free = TRUE, values = 0.5
+   free = TRUE, values = 0.5,
    labels = c("lambda4", "lambda5", "lambda6"))
 
 # Factor variances and covariance - constrain variances to 1
 varFac <- mxPath(from = c("POS", "NEG"), arrows = 2, connect = "unique.pairs",
-   free = c(FALSE, TRUE, FALSE), values = 1, 
+   free = c(FALSE, TRUE, FALSE), values = 1,
    labels = c("phi11", "phi12", "phi22"))
 
 # Factor means - constrain means to 0
@@ -109,12 +110,12 @@ model1 <- mxModel("Two Factor Model", type = "RAM",
 
 ## Run the model and get summary
 fit1 <- mxRun(model1)
-summary(fit1)   
+summary(fit1)
 
 # Number of variables is 6;
 # Number of pieces of information in covariance matrix: (6 X 7) / 2 = 21
 # plus 6 means = 27 pieces of information
-# Number of parameters: 
+# Number of parameters:
 #   6 loadings (3 per factor)
 #   1 covariance between factors
 #   6 residual variances (3 per factor)
@@ -122,11 +123,11 @@ summary(fit1)
 #   Total of 19 parameters
  
 # Therefore, degrees of freedom = 8,
-# and chi sq and fit indices are calculated. 
+# and chi sq and fit indices are calculated.
 # But make sure OpenMx estimates reference models (saturated and independence)
 # upon which to base calculations for chi sq and fit indices.
 
-summary(fit1, refModels = mxRefModels(fit1, run = TRUE)) 
+summary(fit1, refModels = mxRefModels(fit1, run = TRUE))
 coef(fit1)
 
 
@@ -165,14 +166,14 @@ m1 <- "
   neg3 ~ tau6*1
 "
 
-m1_fit = sem(m1, sample.cov = mcov, sample.nobs = n, sample.mean = vmean)
+m1_fit <- sem(m1, sample.cov = mcov, sample.nobs = n, sample.mean = vmean)
 summary(m1_fit)
-OpenMx = coef(fit1)
-lavaan = coef(m1_fit)
+OpenMx <- coef(fit1)
+lavaan <- coef(m1_fit)
 
 # Get coefs in same order
 lavaan <- lavaan[match(names(OpenMx), names(lavaan))]
-t(rbind(OpenMx, lavaan))
+cbind(OpenMx, lavaan)
 ########################
 
 
@@ -183,17 +184,17 @@ t(rbind(OpenMx, lavaan))
 ## Constrain 3rd intercept for POS and 1st intercept for NEG to 0
 
 # Factor loadings - Constrain 3rd loading for POS & 1st loading for NEG to 1
-loadings1 <- mxPath(from = "POS", to = c("pos1", "pos2", "pos3"), arrows = c(0.5, 0.5, 1),
-   free = c(TRUE, TRUE, FALSE), values = 1,
+loadings1 <- mxPath(from = "POS", to = c("pos1", "pos2", "pos3"), arrows = 1,
+   free = c(TRUE, TRUE, FALSE), values = c(0.5, 0.5, 1),
    labels = c("lambda1", "lambda2", "lambda3"))
 
-loadings2 <- mxPath(from = "NEG", to = c("neg1", "neg2", "neg3"), arrows = c(1, 0.5, 0.5),
-   free = c(FALSE, TRUE, TRUE), values = 1,
+loadings2 <- mxPath(from = "NEG", to = c("neg1", "neg2", "neg3"), arrows = 1,
+   free = c(FALSE, TRUE, TRUE), values = c(1, 0.5, 0.5),
    labels = c("lambda4", "lambda5", "lambda6"))
 
 # Factor variances and covariance
 varFac <- mxPath(from = c("POS", "NEG"), arrows = 2, connect = "unique.pairs",
-   free = TRUE, values = c(1, 0.5, 1), 
+   free = TRUE, values = c(1, 0.5, 1),
    labels = c("phi11", "phi12", "phi22"))
 
 # Factor means
@@ -208,8 +209,8 @@ varRes <- mxPath(from = names, arrows = 2,
 
 # Intercepts - constrain 3rd intercept for POS & 1st intercept for NEG to 0
 intercepts <- mxPath(from = "one", to = names, arrows = 1,
-   free = c(TRUE, TRUE, FALSE, FALSE, TRUE, TRUE), 
-   values = c(1, 1, 0, 0, 1, 1),  
+   free = c(TRUE, TRUE, FALSE, FALSE, TRUE, TRUE),
+   values = c(1, 1, 0, 0, 1, 1),
    labels = c("tau1", "tau2", "tau3", "tau4", "tau5", "tau6"))
 
 ## Setup the model
@@ -259,13 +260,13 @@ m2 <- "
   neg3 ~ tau6*1
 "
 
-m2_fit = sem(m2, sample.cov = mcov, sample.nobs = n, sample.mean = vmean)
-OpenMx = coef(fit2)
-lavaan = coef(m2_fit)
+m2_fit <- sem(m2, sample.cov = mcov, sample.nobs = n, sample.mean = vmean)
+OpenMx <- coef(fit2)
+lavaan <- coef(m2_fit)
 
 # Get coefs in same order
-lavaan <- lavaan[match(names(OpenMx), names(lavaan))]      
-t(rbind(OpenMx, lavaan))
+lavaan <- lavaan[match(names(OpenMx), names(lavaan))]
+cbind(OpenMx, lavaan)
 ########################
 
 
@@ -276,12 +277,12 @@ t(rbind(OpenMx, lavaan))
 ## Constrain sum of intercepts to equal 0
 
 # Factor loadings
-loadings1 <- mxPath(from = "POS", to = c("pos1", "pos2", "pos3"), arrows = 0.5,
-   free = TRUE, values = 1,
+loadings1 <- mxPath(from = "POS", to = c("pos1", "pos2", "pos3"), arrows = 1,
+   free = TRUE, values = 0.5,
    labels = c("lambda1", "lambda2", "lambda3"))
 
-loadings2 <- mxPath(from = "NEG", to = c("neg1", "neg2", "neg3"), arrows = 0.5,
-   free = TRUE, values = 1,
+loadings2 <- mxPath(from = "NEG", to = c("neg1", "neg2", "neg3"), arrows = 1,
+   free = TRUE, values = 0.5,
    labels = c("lambda4", "lambda5", "lambda6"))
 
 # Factor variances and covariance
@@ -300,7 +301,7 @@ varRes <- mxPath(from = names, arrows = 2,
 
 # Intercepts
 intercepts <- mxPath(from = "one", to = names, arrows = 1,
-   free = TRUE, values = 1, 
+   free = TRUE, values = 1,
    labels = c("tau1", "tau2", "tau3", "tau4", "tau5", "tau6"))
    
 # Constraints
@@ -365,12 +366,12 @@ m3 <- "
   tau4 + tau5 + tau6 == 0
 "
 
-m3_fit = sem(m3, sample.cov = mcov, sample.nobs = n, sample.mean = vmean)
+m3_fit <- sem(m3, sample.cov = mcov, sample.nobs = n, sample.mean = vmean)
 summary(m3_fit)
-OpenMx = coef(fit3)
-lavaan = coef(m3_fit)
+OpenMx <- coef(fit3)
+lavaan <- coef(m3_fit)
 
 # Get coefs in same order
 lavaan <- lavaan[match(names(OpenMx), names(lavaan))]
-t(rbind(OpenMx, lavaan))
+cbind(OpenMx, lavaan)
 ########################
