@@ -192,7 +192,7 @@ m1 <- "
   pos1 ~~ c(theta71, theta81)*pos1
   pos2 ~~ c(theta72, theta82)*pos2
   pos3 ~~ c(theta73, theta83)*pos3
-  
+
   # Intercepts
   pos1 ~ c(tau1, tau1)*1
   pos2 ~ c(tau2, tau2)*1
@@ -419,12 +419,12 @@ m3 <- "
   pos1 ~~ c(theta71, theta81)*pos1
   pos2 ~~ c(theta72, theta82)*pos2
   pos3 ~~ c(theta73, theta83)*pos3
-  
+
   # Intercepts
   pos1 ~ c(tau1, tau1)*1
   pos2 ~ c(tau2, tau2)*1
   pos3 ~ c(tau3, tau3)*1
-  
+
   # Constraints
   lambda1 + lambda2 + lambda3 == 3
   tau1 + tau2 + tau3 == 0

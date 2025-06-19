@@ -137,12 +137,12 @@ m1 <- "
 
   # Latent mean - Constrained to 0
   POS ~ 0*kappa*1
-  
+
   # Residual variances
   pos1 ~~ theta1*pos1
   pos2 ~~ theta2*pos2
   pos3 ~~ theta3*pos3
-  
+
   # Intercepts 
   pos1 ~ tau1*1
   pos2 ~ tau2*1
@@ -221,7 +221,7 @@ m2 <- "
   pos1 ~~ theta1*pos1
   pos2 ~~ theta2*pos2
   pos3 ~~ theta3*pos3
-  
+
   # Intercepts - Constrain 3rd intercept to 0
   pos1 ~ tau1*1
   pos2 ~ tau2*1
@@ -258,7 +258,7 @@ varFac <- mxPath(from = "POS", arrows = 2,
 means <- mxPath(from = "one", to = "POS", arrows = 1,
    free = TRUE, values = 1,
    labels = "kappa")
-   
+
 # Residual variances
 varRes <- mxPath(from = names, arrows = 2,
    free = TRUE, values = 1,
@@ -305,12 +305,12 @@ m3 <- "
   pos1 ~~ theta1*pos1
   pos2 ~~ theta2*pos2
   pos3 ~~ theta3*pos3
-  
+
   # Intercepts 
   pos1 ~ tau1*1
   pos2 ~ tau2*1
   pos3 ~ tau3*1
-  
+
   # Constraints
   lambda1 + lambda2 + lambda3 == 3
   tau1 + tau2 + tau3 == 0

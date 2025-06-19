@@ -303,7 +303,7 @@ varRes <- mxPath(from = names, arrows = 2,
 intercepts <- mxPath(from = "one", to = names, arrows = 1,
    free = TRUE, values = 1,
    labels = c("tau1", "tau2", "tau3", "tau4", "tau5", "tau6"))
-   
+
 # Constraints
 conLoadPOS <- mxConstraint(lambda1 + lambda2 + lambda3 == 3)
 conLoadNEG <- mxConstraint(lambda4 + lambda5 + lambda6 == 3)
@@ -357,7 +357,7 @@ m3 <- "
   neg1 ~ tau4*1
   neg2 ~ tau5*1
   neg3 ~ tau6*1
-  
+
   # Constraints
   lambda1 + lambda2 + lambda3 == 3
   lambda4 + lambda5 + lambda6 == 3
