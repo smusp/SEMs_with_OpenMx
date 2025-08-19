@@ -4,3 +4,4 @@
 *.md linguist-documentation
 *.qmd linguist-documentation
 *.css linguist-documentation
+*.scss linguist-documentation

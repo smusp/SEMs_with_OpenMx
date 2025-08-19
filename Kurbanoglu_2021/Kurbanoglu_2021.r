@@ -1,24 +1,20 @@
 
-
 ## Kurbanoglu, N. & Takunyaci, M. (2021). A structural equation modeling
 ## on relationship between self-efficacy, physics laboratory anxiety
 ## and attitudes. Journal of Family, Counseling and Education, 6(1), 47-56.
 
-
 ## This example shows a basic three-variable mediation
-## analysis, amd how to use summary data (correlations, 
+## analysis, and how to use summary data (correlations, 
 ## standard deviations, and means) when the raw sample
 ## are not available.
-
 
 ## Load package
 library(OpenMx)
 
-
 ## Get the data from Table 1 (p. 50)
 # Vectors of correlations, standard deviations, and means.
 # Correlations entered row-by-row.
-# (If entered column-by-column, use 'lower.tri' in line 38 below.)
+# (If entered column-by-column, use 'lower.tri' in place of 'upper.tri' below.)
 vcor <- c(
    1,
    0.30,  1,
@@ -27,10 +23,8 @@ vsd   <- c(8.81, 7.95, 18.30)           # Standard deviations
 vmean <- c(56.57, 40.39, 68.22)         # Means
 n <- 513                                # Sample size
 
-
 ## Get the variable names (make sure order is the same as in Table 1)
 names <- c("Att", "SE", "Anx")
-
 
 ## Get the co/variance matrix
 # First, get full correlation matrix
@@ -43,18 +37,13 @@ mcov <- outer(vsd, vsd) * mcor
 
 # Name the rows and columns
 dimnames(mcov) <- list(names, names); mcov
+names(vmean) = names   # OpenMx requires the means to be named
 
-names(vmean) = names   # OpenMx requires the means be named
-
-
-## The model is shown in Fig 1 (p. 51); also see Kurbanoglu_2021.svg in the images folder.
-
+## The model is shown in Fig 1 (p. 51); or see the `images` folder.
 
 #### Collect the bits and pieces needed by OpenMx
-
 ## Get data into OpenMx format
 dataCov <- mxData(observed = mcov, type = "cov", means = vmean, numObs = n)
-
 
 ## Regressions
 regPaths1 <- mxPath(from = c("SE", "Att"), to = "Anx",
@@ -63,21 +52,17 @@ regPaths1 <- mxPath(from = c("SE", "Att"), to = "Anx",
 regPaths2 <- mxPath(from = "SE", to = "Att",
    arrows = 1, values = 0.5, labels = "a")
 
-
 ## Variances
 varPaths <- mxPath(from = names, 
    arrows = 2, values = 1, labels = c("eAtt", "vSE", "eAnx"))
-
 
 ## Means and intercepts
 means <- mxPath(from = "one", to = names,
    arrows = 1, values = 1, labels = c("iAtt", "mSE", "iAnx"))
 
-
 ## Indirect and total effects
 indirect <- mxAlgebra(a * b, name = "indirect")
 total <- mxAlgebra(a * b + cprime, name = "total")
-
 
 ## Setup the model with all the bits
 medModel <- mxModel(model = "Mediation",
@@ -89,18 +74,17 @@ medModel <- mxModel(model = "Mediation",
    means, 
    indirect, total)	
 
-
 ## Run the model and get summary
 fit <- mxRun(medModel)
 summary(fit)
-
+coef(fit)
 
 ## Extract indirect and total effects (and their standard errors) from "fit" object
 estimates <- mxEval(c(indirect, total), fit); estimates
 SE <- sapply(c("indirect", "total"), function(x) mxSE(x, fit, silent = TRUE)); SE
 
-
 ## Get the standardised effects
+# Compare with standardised estimates in Fig 1
 mxStandardizeRAMpaths(fit)
 estZ <- mxStandardizeRAMpaths(fit)[1:3, 8]
 names(estZ) <- mxStandardizeRAMpaths(fit)[1:3, "label"]; estZ
@@ -110,14 +94,13 @@ estZ["indirect"] <- estZ["a"] * estZ["b"]
 estZ["total"] <- estZ["indirect"] + estZ["cprime"]
 estZ
 
-# Compare with standardised estimates in Fig 1
-
-
-## R squares - calculate by hand
+## R squares - have to calculate by hand
 # For variables implicated in regressions,
 # R square is given by matrix product of:
 #   row matrix of correlations and
 #   column matrix of standardised regression coefficients
+
+# Compare with R squares given in Fig 1.
 
 # Get correlations (with names) and standardised regression coefficients
 dimnames(mcor) = list(names, names); mcor
@@ -127,7 +110,6 @@ estZ
 # Correlation between Att and SE, and
 # "a" standardised regression coefficient
 RsqAtt = mcor["Att", "SE"] * estZ["a"]
-
 
 # R Squared for SE and Att predicting Anx
 # Correlations between Anx and SE, and Anx and Att
@@ -141,10 +123,7 @@ Rsq = matrix(c(RsqAtt, RsqAnx),
   2)
 Rsq
 
-# Compare with R squares given in Fig 1
-
-
-## Likelihood-based CIs
+## To get likelihood-based CIs
 ci <- mxCI(c("a", "b", "cprime", "indirect", "total"))
 
 # Add to the model

@@ -1,16 +1,13 @@
 
 #### Methods of Scaling and Identification
 
-
-## Some easy ones first.
+## Some easier examples.
 ## Demonstrates three methods of scaling in a one-factor model:
 ## 1. Reference-Group Method - Constrain latent variable's variance and mean;
 ## 2. Marker-Variable Method - Constrain one loading and that indicator's intercept;
 ## 3. Effects-Scaling Method - Constrain sums of loadings and intercepts.
 
-
-## Compare results from OpenMx with lavaan's results
-
+## Compare results with lavaan's results
 
 ## One Factor:
 #  "Positive Affect" factor for 7th grade
@@ -20,10 +17,8 @@
 # identifying and scaling latent variables in SEM and MACS models.
 # Structural Equation Modeling, 13(1), 59-72.
 
-
 ## Load package
 library(OpenMx)
-
 
 ## Get data
 # Vectors of correlations (row-by-row), standard deviations, and means, and sample size.
@@ -56,17 +51,12 @@ names(vmean) <- names   # OpenMx requires the means be named
 data <- mxData(observed = mcov, type = "cov", means = vmean, numObs = n)
 
 
-
-### Method 1
-## See model diagram in OneFactor1.svg
-#  Labels are Little el al's Greek labels
-
+### Method 1: Reference-Group Method
 ## Constrain latent variance to 1
 ## Constrain latent mean to 0
-
+## See OneFactor1.svg in the `images` folder for the model diagram.
 
 ## Collect the bits and pieces needed by OpenMx
-
 # Factor loadings
 loadings <- mxPath(from = "POS", to = names, arrows = 1,
    free = TRUE, values = 0.5,
@@ -92,12 +82,10 @@ intercepts <- mxPath(from = "one", to = names, arrows = 1,
    free = TRUE, values = 1,
    labels = c("tau1", "tau2", "tau3"))
 
-
 ## Setup the model
 model1 <- mxModel("One Factor Model", type = "RAM",
    manifestVars = names, latentVars = "POS",
    data, loadings, varFac, means, varRes, intercepts)
-
 
 ## Run the model and get summary
 fit1 <- mxRun(model1)
@@ -106,7 +94,7 @@ summary(fit1)
 # These models are just-identified.
 # Number of variables is 3;
 # Therefore, number of pieces of information in co/variance matrix: (3 X 4) / 2 = 6
-# plus 3 means = 9 pieces of information
+# plus 3 means = 9 pieces of information.
 # Number of parameters:
 #   3 loadings
 #   3 redisual variances
@@ -122,7 +110,6 @@ summary(fit1)
 
 summary(fit1, refModels = mxRefModels(fit1, run = TRUE))
 coef(fit1)
-
 
 ########################
 ## Check with lavaan
@@ -159,12 +146,12 @@ cbind(OpenMx, lavaan)
 ########################
 
 
-
-### Method 2
-## See model diagram in OneFactor2.svg
+### Method 2: Marker-Variable Method
 ## Constrain third loading to 1
 ## Constrain third intercept to 0
+## See OneFactor2.svg in the `images` folder for the model diagram.
 
+## Collect the bits and pieces needed by OpenMx
 # Factor loadings - Constrain 3rd loading to 1
 loadings <- mxPath(from = "POS", to = names, arrows = 1,
    free = c(TRUE, TRUE, FALSE), values = c(0.5, 0.5, 1),
@@ -190,18 +177,15 @@ intercepts <- mxPath(from = "one", to = names, arrows = 1,
    free = c(TRUE, TRUE, FALSE), values = c(1, 1, 0),
    labels = c("tau1", "tau2", "tau3"))
 
-
 ## Setup the model
 model2 <- mxModel("One Factor Model", type = "RAM",
    manifestVars = names, latentVars = "POS",
    data, loadings, varFac, means, varRes, intercepts)
 
-
 ## Run the model and get summary
 fit2 <- mxRun(model2)
 summary(fit2, refModels = mxRefModels(fit2, run = TRUE))
 coef(fit2)
-
 
 ########################
 ## Check with lavaan
@@ -238,12 +222,13 @@ cbind(OpenMx, lavaan)
 ########################
 
 
-
-### Method 3
+### Method 3: Effects-Scaling Method
 ## See model diagram in OneFactor3.svg
 ## Constrain sum of loadings to equal number of loadings
 ## Constrain sum of intercepts to equal 0
+## See OneFactor3.svg in the `images` folder for the model diagram.
 
+## Collect the bits and pieces needed by OpenMx
 # Factor loadings
 loadings <- mxPath(from = "POS", to = names, arrows = 1,
    free = TRUE, values = 0.5,
@@ -273,19 +258,16 @@ intercepts <- mxPath(from = "one", to = names, arrows = 1,
 conLoad <- mxConstraint(lambda1 + lambda2 + lambda3 == 3)
 conInter <- mxConstraint(tau1 + tau2 + tau3 == 0)
 
-
 ## Setup the model
 model3 <- mxModel("One Factor Model", type = "RAM",
    manifestVars = names, latentVars = "POS",
    data, loadings, means, varFac, varRes, intercepts,
    conLoad, conInter)
 
-
 ## Run the model and get summary
 fit3 <- mxRun(model3)
 summary(fit3, refModels = mxRefModels(fit3, run = TRUE))
 coef(fit3)
-
 
 ########################
 ## Check with lavaan

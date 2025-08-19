@@ -1,20 +1,16 @@
 
 #### Methods of Scaling and Identification
 
-
-## Some easy ones first.
+## Some easier examples.
 ## Demonstrates three methods of scaling in one-factor, two-group model:
 ## 1. Reference-Group Method - Constrain latent variable's variance and mean;
 ## 2. Marker-Variable Method - Constrain one loading and that indicator's intercept;
 ## 3. Effects-Scaling Method - Constrain sums of loadings and intercepts.
 
-
 ## Following Little et al's lead, assume strong metric invariance:
 ## corresponding loadings and intercepts constrained to equality across groups
 
-
 ## Compare results from OpenMx with lavaan's results
-
 
 ## One Factor, Two Groups
 #  "Positive Affect" factor for 7th and 8th grades
@@ -24,10 +20,8 @@
 # identifying and scaling latent variables in SEM and MACS models.
 # Structural Equation Modeling, 13(1), 59-72.
 
-
 ## Load package
 library(OpenMx)
-
 
 ## Get data
 # Vectors of correlations (row-by-row), standard deviations, and means, and sample size.
@@ -53,7 +47,6 @@ n8     <- 379
 
 # Variable names
 names <- c("pos1", "pos2", "pos3")
-
 
 # Get full correlation matrix for each Grade
 mcor7 <- matrix( , 3, 3)                           # Empty matrix
@@ -86,19 +79,13 @@ data7 <- mxData(observed = mcov7, type = "cov", means = vmean7, numObs = n7)
 data8 <- mxData(observed = mcov8, type = "cov", means = vmean8, numObs = n8)
 
 
-
-### Method 1 
-## See model diagram in OneFactorTwoGroups1.svg
-#  Labels are Little el al's Greek labels
-
+### Method 1: Reference-Group Method
 ## Constrain latent variance to 1
 ## Constrain latent mean to 0
 ## These constraints apply to Grade 7 only.
-
+## See OneFactorTwoGroups1.svg in the `images` folder for the model diagram.
 
 ## Collect the bits and pieces needed by OpenMx
-
-
 # Factor loadings
 loadings <- mxPath(from = "POS", to = names, arrows = 1,
    free = TRUE, values = 0.5,
@@ -132,7 +119,6 @@ intercepts <- mxPath(from = "one", to = names, arrows = 1,
    free = TRUE, values = 1,
    labels = c("tau1", "tau2", "tau3"))
 
-
 ## Setup models for each Grade
 modGr7 <- mxModel("Grade7", type = "RAM",
    manifestVars = names, latentVars = "POS",
@@ -142,11 +128,9 @@ modGr8 <- mxModel("Grade8", type = "RAM",
    manifestVars = names, latentVars = "POS",
    data8, loadings, varFac8, means8, varRes8, intercepts)
 
-
 ## Combine the two models
 fun <- mxFitFunctionMultigroup(c("Grade7.fitfunction", "Grade8.fitfunction"))
 model1 <- mxModel("One Factor Two Group Model", modGr7, modGr8, fun)
-
 
 ## Run the model and get summary
 fit1 <- mxRun(model1)
@@ -172,7 +156,6 @@ summary(fit1)
 
 summary(fit1, refModels = mxRefModels(fit1, run = TRUE))
 coef(fit1)
-
 
 ########################
 ## Check with lavaan
@@ -200,7 +183,6 @@ m1 <- "
 "
 
 m1_fit <- sem(m1, sample.cov = mcov, sample.nobs = n, sample.mean = vmean)
-summary(m1_fit)
 OpenMx <- coef(fit1)
 lavaan <- coef(m1_fit)
 
@@ -210,14 +192,14 @@ cbind(OpenMx, lavaan)
 ########################
 
 
-
-### Method 2
-## See model diagram in OneFactorTwoGroups2.svg
+### Method: Marker-Variable Method
 ## Constrain third loading in POS to 1
 ## Constrain third intercept to 0
 ## With strong measurement invariance,
 ## these constraints apply to both Grades.
+## See OneFactorTwoGroups2.svg in the `images` folder for the model diagram.
 
+## Collect the bits and pieces needed by OpenMx
 # Factor loadings - Constrain 3rd loading to 1
 loadings <- mxPath(from = "POS", to = names, arrows = 1,
    free = c(TRUE, TRUE, FALSE), values = c(0.5, 0.5, 1),
@@ -251,7 +233,6 @@ intercepts <- mxPath(from = "one", to = names, arrows = 1,
    free = c(TRUE, TRUE, FALSE), values = c(1, 1, 0),
    labels = c("tau1", "tau2", "tau3"))
 
-
 ## Setup models for each Grade
 modGr7 <- mxModel("Grade7", type = "RAM",
    manifestVars = names, latentVars = "POS",
@@ -261,17 +242,14 @@ modGr8 <- mxModel("Grade8", type = "RAM",
    manifestVars = names, latentVars = "POS",
    data8, loadings, varFac8, means8, varRes8, intercepts)
 
-
 ## Combine the two models using "mxFitFunctionMultigroup()"
 fun <- mxFitFunctionMultigroup(c("Grade7.fitfunction", "Grade8.fitfunction"))
 model2 <- mxModel("One Factor Two Group Model", modGr7, modGr8, fun)
-
 
 ## Run the model and get summary
 fit2 <- mxRun(model2)
 summary(fit2, refModels = mxRefModels(fit2, run = TRUE))
 coef(fit2)
-
 
 ########################
 ## Check with lavaan
@@ -299,7 +277,6 @@ m2 <- "
 "
 
 m2_fit <- sem(m2, sample.cov = mcov, sample.nobs = n, sample.mean = vmean)
-summary(m2_fit)
 OpenMx <- coef(fit2)
 lavaan <- coef(m2_fit)
 
@@ -309,14 +286,14 @@ cbind(OpenMx, lavaan)
 ########################
 
 
-
 ### Method 3
-## See model diagram in OneFactorTwoGroups3.svg
 ## Constrain sum of loadings to equal number of loadings
 ## Constrain sum of intercepts to equal 0
 ## With strong measurement invariance,
 ## these constraints apply to both Grades.
+## See OneFactorTwoGroups3.svg in the `images` folder for the model diagram.
 
+## Collect the bits and pieces needed by OpenMx
 # Factor loadings
 loadings <- mxPath(from = "POS", to = names, arrows = 1,
    free = TRUE, values = 0.5,
@@ -350,7 +327,6 @@ intercepts <- mxPath(from = "one", to = names, arrows = 1,
    free = TRUE, values = 1,
    labels = c("tau1", "tau2", "tau3"))
 
-
 ## Setup models for each Grade
 modGr7 <- mxModel("Grade7", type = "RAM",
    manifestVars = names, latentVars = "POS",
@@ -360,11 +336,9 @@ modGr8 <- mxModel("Grade8", type = "RAM",
    manifestVars = names, latentVars = "POS",
    data8, loadings, varFac8, means8, varRes8, intercepts)
 
-
 ## Constraints
 conLoad <- mxConstraint(lambda1 + lambda2 + lambda3 == 3)
 conInter <- mxConstraint(tau1 + tau2 + tau3 == 0)
-
 
 ## Combine the two models
 fun <- mxFitFunctionMultigroup(c("Grade7.fitfunction", "Grade8.fitfunction"))
@@ -374,7 +348,6 @@ model3 <- mxModel("One Factor Two Group Model", modGr7, modGr8,
 # Note: Constraints are added to final model, not to each of the Grade7 and Grade 8 models;
 # otherwise, OpenMx will count them as 4 constraints, accounting for 4 degrees of freedom,
 # instead of 2.
-
 
 ## Run the model and get summary
 fit3 <- mxRun(model3)
@@ -399,7 +372,6 @@ summary(fit3, refModels = mxRefModels(fit3, run = TRUE))
 # If the constraints were added to each Grade's model,
 # OpenMx would have counted them as 4 constraints (even thought they are identical),
 # resulting in 6 degrees of freedom for the model.
-
 
 ########################
 ## Check with lavaan
@@ -431,7 +403,6 @@ m3 <- "
 "
 
 m3_fit <- sem(m3, sample.cov = mcov, sample.nobs = n, sample.mean = vmean)
-summary(m3_fit)
 OpenMx <- coef(fit3)
 lavaan <- coef(m3_fit)
 

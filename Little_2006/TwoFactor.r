@@ -1,8 +1,7 @@
 
 #### Methods of Scaling and Identification
 
-
-## Some easy ones first.
+## Some easier examples.
 ## Demonstrates three methods of scaling in two-factor model:
 ## 1. Reference-Group Method - Constrain latent variables' variances and means;
 ## 2. Marker-Variable Method - Constrain one loading and that indicator's
@@ -10,9 +9,7 @@
 ## 3. Effects-Scaling Method - Constrain sums of loadings and intercepts
 ##    for both factors.
 
-
-## Compare results from OpenMx with lavaan's results
-
+## Compare results with lavaan's results
 
 ## Two Factors
 #  "Positive Affect" and "Negative Affect" factors for 7th grade
@@ -22,10 +19,8 @@
 # identifying and scaling latent variables in SEM and MACS models.
 # Structural Equation Modeling, 13(1), 59-72.
 
-
 ## Load package
 library(OpenMx)
-
 
 ## Get data
 # Vectors of correlations (row-by-row), standard deviations, and means, and sample size.
@@ -62,17 +57,13 @@ names(vmean) <- names   # OpenMx requires the means be named
 data <- mxData(observed = mcov, type = "cov", means = vmean, numObs = n)
 
 
-
-### Method 1
-## See model diagram in TwoFactors1.svg
-# Labels are Little el al's Greek labels
+### Method 1: Reference-Group Method
 
 ## Constrain latent variances to 1
 ## Constrain latent means to 0
-
+## See TwoFactor1.svg in the `images` folder for the model diagram.
 
 ## Collect the bits and pieces needed by OpenMx
-
 # Factor loadings
 loadings1 <- mxPath(from = "POS", to = c("pos1", "pos2", "pos3"), arrows = 1,
    free = TRUE, values = 0.5,
@@ -107,7 +98,6 @@ model1 <- mxModel("Two Factor Model", type = "RAM",
    manifestVars = names, latentVars = c("POS", "NEG"),
    data, loadings1, loadings2, varFac, means, varRes, intercepts)
 
-
 ## Run the model and get summary
 fit1 <- mxRun(model1)
 summary(fit1)
@@ -129,7 +119,6 @@ summary(fit1)
 
 summary(fit1, refModels = mxRefModels(fit1, run = TRUE))
 coef(fit1)
-
 
 ########################
 ## Check with lavaan
@@ -167,7 +156,6 @@ m1 <- "
 "
 
 m1_fit <- sem(m1, sample.cov = mcov, sample.nobs = n, sample.mean = vmean)
-summary(m1_fit)
 OpenMx <- coef(fit1)
 lavaan <- coef(m1_fit)
 
@@ -178,11 +166,12 @@ cbind(OpenMx, lavaan)
 
 
 
-### Method 2
-## See model diagram in TwoFactors2.svg
+### Method 2: Marker-Variable Method
 ## Constrain 3rd loading for POS and 1st loading for NEG to 1
 ## Constrain 3rd intercept for POS and 1st intercept for NEG to 0
+## See TwoFactor2.svg in the `images` folder for the model diagram.
 
+## Collect the bits and pieces needed by OpenMx
 # Factor loadings - Constrain 3rd loading for POS & 1st loading for NEG to 1
 loadings1 <- mxPath(from = "POS", to = c("pos1", "pos2", "pos3"), arrows = 1,
    free = c(TRUE, TRUE, FALSE), values = c(0.5, 0.5, 1),
@@ -218,12 +207,10 @@ model2 <- mxModel("Two Factor Model", type = "RAM",
    manifestVars = names, latentVars = c("POS", "NEG"),
    data, loadings1, loadings2, varFac, means, varRes, intercepts)
 
-
 ## Run the model and get summary
 fit2 <- mxRun(model2)
 summary(fit2, refModels = mxRefModels(fit2, run = TRUE))
 coef(fit2)
-
 
 ########################
 ## Check with lavaan
@@ -270,12 +257,12 @@ cbind(OpenMx, lavaan)
 ########################
 
 
-
-### Method 3
-## See model diagram in TwoFactors3.svg
+### Method 3: Effects-Scaling Method
 ## Constrain sum of loadings to equal number of loadings
 ## Constrain sum of intercepts to equal 0
+## See TwoFactor3.svg in the `images` folder for the model diagram.
 
+## Collect the bits and pieces needed by OpenMx
 # Factor loadings
 loadings1 <- mxPath(from = "POS", to = c("pos1", "pos2", "pos3"), arrows = 1,
    free = TRUE, values = 0.5,
@@ -310,19 +297,16 @@ conLoadNEG <- mxConstraint(lambda4 + lambda5 + lambda6 == 3)
 conInterPOS <- mxConstraint(tau1 + tau2 + tau3 == 0)
 conInterNEG <- mxConstraint(tau4 + tau5 + tau6 == 0)
 
-
 ## Setup the model
 model3 <- mxModel("Two Factor Model", type = "RAM",
    manifestVars = names, latentVars = c("POS", "NEG"),
    data, loadings1, loadings2, varFac, means, varRes, intercepts,
    conLoadPOS, conLoadNEG, conInterPOS, conInterNEG)
 
-
 ## Run the model and get summary
 fit3 <- mxRun(model3)
 summary(fit3, refModels = mxRefModels(fit3, run = TRUE))
 coef(fit3)
-
 
 ########################
 ## Check with lavaan
@@ -367,7 +351,6 @@ m3 <- "
 "
 
 m3_fit <- sem(m3, sample.cov = mcov, sample.nobs = n, sample.mean = vmean)
-summary(m3_fit)
 OpenMx <- coef(fit3)
 lavaan <- coef(m3_fit)
 

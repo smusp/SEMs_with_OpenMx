@@ -1,9 +1,7 @@
 
-
 ## Little, T., Slegers, D., & Card, N. (2006). A non-arbitrary method of
 ## identifying and scaling latent variables in SEM and MACS models.
 ## Structural Equation Modeling, 13(1), 59-72.
-
 
 ## Methods of Scaling and Identification
 
@@ -12,19 +10,15 @@
 ## 2. Marker-variable method - Constrain one loading and that indicator's intercept in both factors;
 ## 3. Effect-scaling method - Constrain sums of loadings and intercepts for both factors.
 
-
 ## Little et al assume strong metric invariance:
 ## Corresponding loadings and intercepts constrained to equality across groups
-
 
 ## Compare with results given in Table 2 (pp. 64-65)
 ## Little et al show results for three versions of Method 2.
 ## Only the third is demonstrated here.
 
-
 ## Load package
 library(OpenMx)
-
 
 ## Get the data from Appendix A
 # 7th grade
@@ -53,10 +47,8 @@ mean8 <- c(3.07338, 2.84716, 2.97882, 1.71700, 1.57955, 1.55001)
 sd8   <- c(0.70299, 0.71780, 0.76208, 0.65011, 0.60168, 0.61420)
 n8    <- 379
 
-
 ## Get the variable names from Appendix A
 names = c("pos1", "pos2", "pos3", "neg1", "neg2", "neg3")
-
 
 # Get full correlation matrix for each Grade
 mcor7 <- matrix( , 6, 6)                         # Empty matrix
@@ -84,18 +76,13 @@ data7 <- mxData(observed = mcov7, type = "cov", means = mean7, numObs = n7)
 data8 <- mxData(observed = mcov8, type = "cov", means = mean8, numObs = n8)
 
 
-
-### Reference-Group Method
-## See model diagram in Scaling1.svg
-
-
+### Meethod 1: Reference-Group Method
 ## Constrain latent variances to 1
 ## Constrain latent means to 0
 ## These constraints apply to Grade 7 only.
-
+## See Scaling1.svg in the `images` folder for the model diagram.
 
 ## Collect the bits and pieces needed by OpenMx
-
 # Factor loadings
 loadings1 <- mxPath(from = "POS", to = c("pos1", "pos2", "pos3"), arrows = 1,
    free = TRUE, values = 0.5,
@@ -137,7 +124,6 @@ intercepts <- mxPath(from = "one", to = names, arrows = 1,
    free = TRUE, values = 1,
    labels = c("tau1", "tau2", "tau3", "tau4", "tau5", "tau6"))
 
-
 ## Setup models for each Grade
 modGr7 <- mxModel("Grade7", type = "RAM",
    manifestVars = names, latentVars = c("POS", "NEG"),
@@ -147,34 +133,25 @@ modGr8 <- mxModel("Grade8", type = "RAM",
    manifestVars = names, latentVars = c("POS", "NEG"),
    data8, loadings1, loadings2, varFac8, means8, varRes8, intercepts)
 
-
 ## Combine the two models
 fun <- mxFitFunctionMultigroup(c("Grade7.fitfunction", "Grade8.fitfunction"))
 model1 <- mxModel("Referemce Group Method", modGr7, modGr8, fun)
 
-
 ## Run the model and get summary
+# Compare with results for Method 1 in Table 2.
 fit1 <- mxRun(model1)
 summary1 <- summary(fit1, refModels = mxRefModels(fit1, run = TRUE))
 summary1
 
-# Compare with results for Method 1 in Table 2.
 
-
-
-### Marker-Variable Method
-## See model diagram in Scaling2.svg
-
-
+### Method 2: Marker-Variable Method
 ## Constrain 3rd loading in POS to 1 in both groups
 ## Constrain 1st loading in NEG to 1 in both groups
 ## Constrain 3rd intercept in POS to 0 in both groups
 ## Constrain 1st intercept in NEG to 0 in both groups
-
+## See Scaling2.svg in the `images` folder for the model diagram.
 
 ## Collect the bits and pieces needed by OpenMx
-
-
 # Factor loadings - 3rd loading for POS constrained to 1
 #                 - 1st loading for NEG constrained to 1
 loadings1 <- mxPath(from = "POS", to = c("pos1", "pos2", "pos3"), arrows = 1,
@@ -217,7 +194,6 @@ intercepts <- mxPath(from = "one", to = names, arrows = 1,
    free = c(TRUE, TRUE, FALSE, FALSE, TRUE, TRUE), values = c(1, 1, 0, 0, 1, 1),
    labels = c("tau1", "tau2", "tau3", "tau4", "tau5", "tau6"))
 
-
 ## Setup models for each Grade
 modGr7 <- mxModel("Grade7", type = "RAM",
    manifestVars = names, latentVars = c("POS", "NEG"),
@@ -227,31 +203,23 @@ modGr8 <- mxModel("Grade8", type = "RAM",
    manifestVars = names, latentVars = c("POS", "NEG"),
    data8, loadings1, loadings2, varFac8, means8, varRes8, intercepts)
 
-
 ## Combine the two models
 fun <- mxFitFunctionMultigroup(c("Grade7.fitfunction", "Grade8.fitfunction"))
 model2 <- mxModel("Referemce Group Method", modGr7, modGr8, fun)
 
-
 ## Run the model and get summary
+# Compare with results for third Method 2 in Table 2.
 fit2 <- mxRun(model2)
 summary2 <- summary(fit2, refModels = mxRefModels(fit2, run = TRUE))
 summary2
 
-# Compare with results for third Method 2 in Table 2.
 
-
-
-### Effects-Scaling Method
-## See model diagram in Scaling3.svg
-
-
+### Method 3: Effects-Scaling Method
 ## Constrain loadings to add to 3 in both factors for both Grades
 ## Constrain intercepts to add to 0 in both factors for both Grades
-
+## See Scaling3.svg in the `images` folder for the model diagram.
 
 ## Collect the bits and pieces needed by OpenMx
-
 # Factor loadings
 loadings1 <- mxPath(from = "POS", to = c("pos1", "pos2", "pos3"), arrows = 1,
    free = TRUE, values = 0.5,
@@ -293,7 +261,6 @@ intercepts <- mxPath(from = "one", to = names, arrows = 1,
    free = TRUE, values = 1,
    labels = c("tau1", "tau2", "tau3", "tau4", "tau5", "tau6"))
 
-
 ## Setup models for each Grade
 modGr7 <- mxModel("Grade7", type = "RAM",
    manifestVars = names, latentVars = c("POS", "NEG"),
@@ -303,27 +270,22 @@ modGr8 <- mxModel("Grade8", type = "RAM",
    manifestVars = names, latentVars = c("POS", "NEG"),
    data8, loadings1, loadings2, varFac8, means8, varRes8, intercepts)
 
-
 ## Constraints
 conLoad1  <- mxConstraint(lambda1 + lambda2 + lambda3 == 3)
 conLoad2  <- mxConstraint(lambda4 + lambda5 + lambda6 == 3)
 conInter1 <- mxConstraint(tau1 + tau2 + tau3 == 0)
 conInter2 <- mxConstraint(tau4 + tau5 + tau6 == 0)
 
-
 ## Combine the two models
 fun <- mxFitFunctionMultigroup(c("Grade7.fitfunction", "Grade8.fitfunction"))
 model3 <- mxModel("Referemce Group Method", modGr7, modGr8,
           conLoad1, conLoad2, conInter1, conInter2, fun)
 
-
 ## Run the model and get summary
+# Compare with results for Method 3 in Table 2.
 fit3 <- mxRun(model3)
 summary3 <- summary(fit3, refModels = mxRefModels(fit3, run = TRUE))
 summary3
-
-# Compare with results for Method 3 in Table 2.
-
 
 ## Get fit measures
 #  Compare with fit measures given on page 66
@@ -339,9 +301,8 @@ fit2 <- do.call(rbind, lapply(models, `[[`, "RMSEACI"))
 
 cbind(fit1, fit2)
 
-
-## Note: RMSEA given by OpenMx does not agree with the value given
-#  by Little et al. OpenMx does not adjust RMSEA in multiple group models -
+## Note: RMSEA given by OpenMx does not agree with the value given by Little et al. 
+#  OpenMx does not adjust RMSEA in multiple group models -
 #  see the RMSEA section in ?mxSummary for brief explanation, and
 # https://openmx.ssri.psu.edu/index.php/forums/opensem-forums/fit-functions/rmsea-multiple-group-analysis
 #  for another discussion.
