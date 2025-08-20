@@ -27,7 +27,7 @@ summary(df)
 ## Get the names of the variables
 manifest <- names(df)
 
-## Data - Get data into OpenMx format
+## Get data into OpenMx format
 dataRaw <- mxData(observed = df, type = "raw")
 
 ## Regressions
@@ -67,7 +67,7 @@ varPaths <- mxPath(from = manifest,
 
 ## Means and intercepts
 ## Exogenous variables ("ple") have means;
-## endogenous variables ("grat" and "shs") have intercepts.
+## Endogenous variables ("grat" and "shs") have intercepts.
 ## Regress variables on a constant - in OpenMx, "one".
 ## Means and intercepts are not shown in the model diagram.
 ## The distinction does not matter to OpenMx, but I distinguish in the labels.

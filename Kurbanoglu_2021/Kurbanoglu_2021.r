@@ -19,7 +19,7 @@ vcor <- c(
    1,
    0.30,  1,
   -0.42, -0.32,  1)
-vsd   <- c(8.81, 7.95, 18.30)           # Standard deviations
+vsd <- c(8.81, 7.95, 18.30)             # Standard deviations
 vmean <- c(56.57, 40.39, 68.22)         # Means
 n <- 513                                # Sample size
 
