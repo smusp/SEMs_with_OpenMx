@@ -33,8 +33,8 @@ vcor <- c(
   -0.02222, -0.05180, -0.10250,  0.81616,  0.81076,  1.00000)
 
 vmean <- c(3.13552, 2.99061, 3.06945, 1.70069, 1.52705, 1.54483)
-vsd   <- c(0.66770, 0.68506, 0.70672, 0.71418, 0.66320, 0.65276)
-n     <- 380
+vsd <- c(0.66770, 0.68506, 0.70672, 0.71418, 0.66320, 0.65276)
+n <- 380
 
 # Variable names
 names <- c("pos1", "pos2", "pos3", "neg1", "neg2", "neg3")
@@ -58,7 +58,6 @@ data <- mxData(observed = mcov, type = "cov", means = vmean, numObs = n)
 
 
 ### Method 1: Reference-Group Method
-
 ## Constrain latent variances to 1
 ## Constrain latent means to 0
 ## See TwoFactor1.svg in the `images` folder for the model diagram.
